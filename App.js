@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {
+  Alert,
   Button,
   Pressable,
   SafeAreaView,
@@ -11,8 +12,11 @@ import {
   View,
 } from 'react-native';
 
-import TitledContainer from './components/TitledContainer';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import LoadGameModal from './components/LoadGameModal';
+import TitledContainer from './components/TitledContainer';
+
+import Storage from './components/Storage';
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -26,6 +30,7 @@ const App = () => {
   const [dimensions, setDimensions] = useState(3);
   const [MAX_GRID, MIN_GRID] = [10, 3];
   const [intervalId, setIntervalId] = useState(0);
+  const [showModal, setShowModal] = useState(false);
 
   const [playing, setPlaying] = useState(false);
 
@@ -47,7 +52,7 @@ const App = () => {
   }, [playing, grid]);
 
   const ripple = {
-    color: 'blue',
+    // color: 'blue',
     radius: 50,
     // foreground: true,
   };
@@ -58,36 +63,33 @@ const App = () => {
       fn: () => {
         setGeneration(1);
         setPopulation(0);
+
+        // make a square matrix with 0s
+        const newGrid = [];
+        for (let i = 0; i < dimensions; i++) {
+          const row = [];
+          for (let j = 0; j < dimensions; j++) {
+            row.push(0);
+          }
+          newGrid.push(row);
+        }
+
+        setGrid(newGrid);
+      },
+    },
+    {
+      icon: 'random',
+      fn: () => {
+        setGeneration(1);
+        setPopulation(0);
         newGrid();
       },
     },
-    {icon: 'backward', fn: () => {}},
+    {icon: 'backward', fn: () => {}}, // TODO: HISTORY
     {
       icon: playing ? 'pause' : 'play',
       fn: () => {
-        // setPlaying(!playing);
-        // if (playing) {
-        //   timer = setInterval(() => {
-        //     nextGeneration();
-        //   }, 1000);
-        // } else {
-        //   clearInterval(timer);
-        // }
-
         setPlaying(prevPlaying => !prevPlaying);
-
-        // if (intervalId) {
-        //   clearInterval(intervalId);
-        //   setIntervalId(0);
-        //   setPlaying(false);
-        //   return;
-        // }
-        // setPlaying(true);
-        // const newIntervalId = setInterval(() => {
-        //   // setCount(prevCount => prevCount + 1);
-        //   nextGeneration();
-        // }, 1000);
-        // setIntervalId(newIntervalId);
       },
     },
     {
@@ -160,6 +162,7 @@ const App = () => {
                 let newGrid = [...grid];
                 newGrid[rowIndex][colIndex] = col === 0 ? 1 : 0;
                 setGrid(newGrid);
+                setPopulation(getPopulation());
               }
             }}
             // onLongPress={() => console.log(getNeighbors(rowIndex, colIndex))}
@@ -169,6 +172,10 @@ const App = () => {
         ))}
       </View>
     ));
+
+  const getPopulation = () => {
+    return grid.flat().filter(cell => cell == 1).length;
+  };
 
   const nextGeneration = () => {
     let newGrid = grid.map(arr => arr.slice());
@@ -240,56 +247,131 @@ const App = () => {
 
       <View style={{width: '80%'}}>{renderGrid()}</View>
 
+      <LoadGameModal
+        isVisible={showModal}
+        onCancel={() => setShowModal(false)}
+        loadGame={game => {
+          setPlaying(false);
+          setDimensions(game.dimensions);
+          setGrid(game.grid);
+          setGeneration(game.generation);
+          setPopulation(game.population);
+          setShowModal(false);
+        }}
+      />
+
       <View>
         <View
           style={{
             justifyContent: 'space-evenly',
             flexDirection: 'row',
-            alignItems: 'center',
           }}>
           <Text style={styles.info}>Generation: {generation}</Text>
           <Text style={styles.info}>Population: {population}</Text>
         </View>
 
-        <View style={{justifyContent: 'space-evenly', flexDirection: 'column'}}>
-          <View style={{flexDirection: 'row'}}>
+        <View
+          style={{
+            flexDirection: 'column',
+          }}>
+          <View
+            style={{
+              justifyContent: 'space-between',
+              flexDirection: 'row',
+            }}>
             <TitledContainer title={'Grid size'}>
-              <Pressable
-                style={[styles.btn, styles.gridBtn]}
-                onPress={() => {
-                  if (dimensions < MAX_GRID && !playing)
-                    setDimensions(dimensions + 1);
-                }}
-                android_ripple={ripple}>
-                <Text style={[styles.btnText]}>+</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.btn, styles.gridBtn]}
-                onPress={() => {
-                  if (dimensions >= MIN_GRID && !playing)
-                    setDimensions(dimensions - 1);
-                }}
-                android_ripple={ripple}>
-                <Text style={[styles.btnText]}>-</Text>
-              </Pressable>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Pressable
+                  style={[styles.btn, styles.gridBtn]}
+                  onPress={() => {
+                    if (dimensions < MAX_GRID && !playing)
+                      setDimensions(dimensions + 1);
+                  }}
+                  android_ripple={ripple}>
+                  <Icon
+                    name="plus"
+                    size={20}
+                    color="#ccc"
+                    style={playing ? styles.inactive : styles.active}
+                  />
+                </Pressable>
+                <Pressable
+                  style={[styles.btn, styles.gridBtn]}
+                  onPress={() => {
+                    if (dimensions >= MIN_GRID && !playing)
+                      setDimensions(dimensions - 1);
+                  }}
+                  android_ripple={ripple}>
+                  <Icon
+                    name="minus"
+                    size={20}
+                    color="#ccc"
+                    style={playing ? styles.inactive : styles.active}
+                  />
+                </Pressable>
+              </View>
             </TitledContainer>
 
             <TitledContainer title={'Game'}>
               <Pressable
-                style={[styles.btn, styles.gridBtn]}
-                // onPress={() => {
-                //   if (dimensions < MAX_GRID) setDimensions(dimensions + 1);
-                // }}
+                style={[styles.btn]}
+                onPress={async () => {
+                  if (!playing) {
+                    let index = await Storage.getIdsForKey('game');
+                    index = index.length + 1;
+
+                    const save = {
+                      grid,
+                      generation,
+                      population,
+                      dimensions,
+
+                      time: new Date(),
+                    };
+
+                    Storage.save({
+                      key: 'game',
+                      id: index,
+                      data: save,
+
+                      expires: null,
+                    })
+                      .then(() => {
+                        Alert.alert('Game saved succesfully');
+                      })
+                      .catch(err => {
+                        Alert.alert(
+                          'Error',
+                          'Error while trying to save game: ' + err.message,
+                        );
+                        console.log(err);
+                      });
+                  }
+                }}
                 android_ripple={ripple}>
-                <Text style={[styles.btnText]}>Save</Text>
+                <Text
+                  style={[
+                    styles.btnText,
+                    playing ? styles.inactive : styles.active,
+                  ]}>
+                  Save
+                </Text>
               </Pressable>
               <Pressable
-                style={[styles.btn, styles.gridBtn]}
-                // onPress={() => {
-                //   if (dimensions >= MIN_GRID) setDimensions(dimensions - 1);
-                // }}
+                style={[styles.btn]}
+                onPress={() => {
+                  if (!playing) {
+                    setShowModal(true);
+                  }
+                }}
                 android_ripple={ripple}>
-                <Text style={[styles.btnText]}>Load</Text>
+                <Text
+                  style={[
+                    styles.btnText,
+                    playing ? styles.inactive : styles.active,
+                  ]}>
+                  Load
+                </Text>
               </Pressable>
             </TitledContainer>
           </View>
@@ -307,7 +389,12 @@ const App = () => {
                   style={[styles.btn]}
                   onPress={() => action.fn()}
                   android_ripple={ripple}>
-                  <Icon name={action.icon} size={30} color="#ccc" />
+                  <Icon
+                    name={action.icon}
+                    // size={30}
+                    color="#ccc"
+                    style={styles.genIcon}
+                  />
                 </Pressable>
               ))}
             </View>
@@ -340,15 +427,17 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     borderWidth: 1,
   },
+  gridBtn: {width: 50, height: 50, aspectRatio: 1},
+
   btn: {
-    // backgroundColor: 'blue',
-    // flex: 1,}
-    // aspectRatio: 1,
-    // minWidth: 50,
-    padding: 20,
+    padding: 15,
     backgroundColor: '#111',
     margin: 5,
     elevation: 5,
+    borderRadius: 10,
+
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   btnText: {
     fontSize: 20,
@@ -357,6 +446,18 @@ const styles = StyleSheet.create({
   // gridBtn: {aspectRatio: 1, width: 30},
   alive: {backgroundColor: 'green'},
   dead: {backgroundColor: 'red'},
+  active: {
+    color: 'white',
+  },
+  inactive: {
+    color: 'gray',
+  },
+  genIcon: {
+    fontSize: 30,
+    width: 30,
+    height: 30,
+    textAlign: 'center',
+  },
 });
 
 export default App;
