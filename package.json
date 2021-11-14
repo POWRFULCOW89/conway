@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@miblanchard/react-native-slider": "^2.0.2",
+    "@react-native-async-storage/async-storage": "^1.15.11",
     "debug": "^4.3.2",
     "jsesc": "^3.0.2",
     "react": "17.0.2",
     "react-native": "0.66.3",
+    "react-native-storage": "^1.0.1",
     "react-native-vector-icons": "^9.0.0",
     "regjsparser": "^0.7.0",
     "sane": "^5.0.1"
