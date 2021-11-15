@@ -85,7 +85,7 @@ const App = () => {
         newGrid();
       },
     },
-    {icon: 'backward', fn: () => {}}, // TODO: HISTORY
+    // {icon: 'backward', fn: () => {}}, // TODO: HISTORY
     {
       icon: playing ? 'pause' : 'play',
       fn: () => {
@@ -387,7 +387,7 @@ const App = () => {
           <TitledContainer title="Generation">
             <View
               style={{
-                // width: 200,
+                flex: 1,
                 justifyContent: 'space-evenly',
                 alignItems: 'center',
                 flexDirection: 'row',

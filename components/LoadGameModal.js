@@ -11,12 +11,12 @@ import {
 
 import Storage from './Storage';
 
-const games = Array(15).fill({
-  id: 1,
-  time: new Date(),
-  generation: 100,
-  population: 10,
-});
+// const games = Array(15).fill({
+//   id: 1,
+//   time: new Date(),
+//   generation: 100,
+//   population: 10,
+// });
 
 const ripple = {
   color: 'lightgray',
@@ -47,7 +47,7 @@ const LoadGameModal = props => {
 
   const getSaves = async () => {
     await Storage.getAllDataForKey('game').then(games => {
-      console.log(games);
+      // console.log(games);
       setSaves(
         games.map((game, i) => (
           // <Text>{`${game}`}</Text>
