@@ -55,7 +55,9 @@ const LoadGameModal = props => {
             key={`game-${i + 1}`}
             style={styles.game}
             onPress={() => {
-              props?.loadGame(game);
+              Storage.load({key: 'game', id: i}).then(game => {
+                props.loadGame(Object.assign({}, game));
+              });
             }}
             android_ripple={ripple}>
             <Text style={styles.text}>{`#${i + 1} | ${parseDate(

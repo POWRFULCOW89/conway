@@ -251,12 +251,17 @@ const App = () => {
         isVisible={showModal}
         onCancel={() => setShowModal(false)}
         loadGame={game => {
+          // console.log(`incoming: ${JSON.stringify(game.grid)}`);
+          // console.log(`current: ${JSON.stringify(grid)}`);
+
           setPlaying(false);
           setDimensions(game.dimensions);
-          setGrid(game.grid);
+          setGrid(JSON.parse(JSON.stringify(game.grid)));
           setGeneration(game.generation);
           setPopulation(game.population);
           setShowModal(false);
+
+          // console.log(`final: ${JSON.stringify(grid)}`);
         }}
       />
 
@@ -318,18 +323,22 @@ const App = () => {
                 onPress={async () => {
                   if (!playing) {
                     let index = await Storage.getIdsForKey('game');
-                    index = index.length + 1;
+                    index = index.length;
 
-                    const save = {
-                      grid,
-                      generation,
-                      population,
-                      dimensions,
+                    const save = Object.assign(
+                      {},
+                      {
+                        grid: grid,
+                        generation,
+                        population,
+                        dimensions,
+                        time: new Date(),
+                      },
+                    );
 
-                      time: new Date(),
-                    };
+                    console.log(`saving: ${JSON.stringify(save.grid)}`);
 
-                    Storage.save({
+                    await Storage.save({
                       key: 'game',
                       id: index,
                       data: save,
