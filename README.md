@@ -6,4 +6,4 @@ Implementation of Conway's Game of Life in React Native. Cells can manually be s
 <img src="conway.gif" width="300"/>
 </p>
 
-[APK](https://github.com/POWRFULCOW89/conway/releases/download/v1.0.0/Conway.apk)
+Get the [APK](https://github.com/POWRFULCOW89/conway/releases/download/v1.0.0/Conway.apk)
