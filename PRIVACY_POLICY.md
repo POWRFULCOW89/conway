@@ -1,4 +1,5 @@
-Conway: Privacy policy
+# Conway: Privacy policy
+
 Welcome to the Conway app for Android!
 
 This is an open source Android app developed by Diego Melo. The source code is available on GitHub under the GPL 3.0 license; also available on Google Play.
