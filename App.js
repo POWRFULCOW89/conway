@@ -17,6 +17,7 @@ import LoadGameModal from './components/LoadGameModal';
 import TitledContainer from './components/TitledContainer';
 
 import Storage from './components/Storage';
+import Theme from './components/Theme';
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -28,13 +29,13 @@ const App = () => {
   const [generation, setGeneration] = useState(1);
   const [population, setPopulation] = useState(0);
   const [dimensions, setDimensions] = useState(3);
-  const [MAX_GRID, MIN_GRID] = [10, 3];
-  const [intervalId, setIntervalId] = useState(0);
+  const [MAX_GRID, MIN_GRID] = [15, 3];
+  // const [intervalId, setIntervalId] = useState(0);
   const [showModal, setShowModal] = useState(false);
 
   const [playing, setPlaying] = useState(false);
 
-  let timer;
+  // let timer;
 
   useEffect(() => {
     changeGridSize();
@@ -234,13 +235,18 @@ const App = () => {
         styles.backgroundStyle,
         styles.center,
         {justifyContent: 'space-evenly'},
-        {backgroundColor: isDarkMode ? '#222' : '#eee'},
+        {
+          backgroundColor: isDarkMode
+            ? Theme.dark.backgroundColor
+            : Theme.light.backgroundColor,
+        },
       ]}>
       <Text
         style={{
           fontSize: 25,
           fontFamily: 'monospace',
           fontWeight: 'bold',
+          color: isDarkMode ? Theme.dark.textColor : Theme.light.textColor,
         }}>
         Conway's Game of Life
       </Text>
@@ -271,8 +277,28 @@ const App = () => {
             justifyContent: 'space-evenly',
             flexDirection: 'row',
           }}>
-          <Text style={styles.info}>Generation: {generation}</Text>
-          <Text style={styles.info}>Population: {population}</Text>
+          <Text
+            style={[
+              styles.info,
+              {
+                color: isDarkMode
+                  ? Theme.dark.textColor
+                  : Theme.light.textColor,
+              },
+            ]}>
+            Generation: {generation}
+          </Text>
+          <Text
+            style={[
+              styles.info,
+              {
+                color: isDarkMode
+                  ? Theme.dark.textColor
+                  : Theme.light.textColor,
+              },
+            ]}>
+            Population: {population}
+          </Text>
         </View>
 
         <View
@@ -287,7 +313,15 @@ const App = () => {
             <TitledContainer title={'Grid size'}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Pressable
-                  style={[styles.btn, styles.gridBtn]}
+                  style={[
+                    styles.btn,
+                    styles.gridBtn,
+                    {
+                      backgroundColor: isDarkMode
+                        ? Theme.dark.btnBackground
+                        : Theme.light.btnBackground,
+                    },
+                  ]}
                   onPress={() => {
                     if (dimensions < MAX_GRID && !playing)
                       setDimensions(dimensions + 1);
@@ -301,7 +335,15 @@ const App = () => {
                   />
                 </Pressable>
                 <Pressable
-                  style={[styles.btn, styles.gridBtn]}
+                  style={[
+                    styles.btn,
+                    styles.gridBtn,
+                    {
+                      backgroundColor: isDarkMode
+                        ? Theme.dark.btnBackground
+                        : Theme.light.btnBackground,
+                    },
+                  ]}
                   onPress={() => {
                     if (dimensions >= MIN_GRID && !playing)
                       setDimensions(dimensions - 1);
@@ -319,7 +361,14 @@ const App = () => {
 
             <TitledContainer title={'Game'}>
               <Pressable
-                style={[styles.btn]}
+                style={[
+                  styles.btn,
+                  {
+                    backgroundColor: isDarkMode
+                      ? Theme.dark.btnBackground
+                      : Theme.light.btnBackground,
+                  },
+                ]}
                 onPress={async () => {
                   if (!playing) {
                     let index = await Storage.getIdsForKey('game');
@@ -367,7 +416,14 @@ const App = () => {
                 </Text>
               </Pressable>
               <Pressable
-                style={[styles.btn]}
+                style={[
+                  styles.btn,
+                  {
+                    backgroundColor: isDarkMode
+                      ? Theme.dark.btnBackground
+                      : Theme.light.btnBackground,
+                  },
+                ]}
                 onPress={() => {
                   if (!playing) {
                     setShowModal(true);
@@ -395,7 +451,14 @@ const App = () => {
               {actions.map((action, index) => (
                 <Pressable
                   key={`${action.icon}-${index}`}
-                  style={[styles.btn]}
+                  style={[
+                    styles.btn,
+                    {
+                      backgroundColor: isDarkMode
+                        ? Theme.dark.btnBackground
+                        : Theme.light.btnBackground,
+                    },
+                  ]}
                   onPress={() => action.fn()}
                   android_ripple={ripple}>
                   <Icon
@@ -440,7 +503,7 @@ const styles = StyleSheet.create({
 
   btn: {
     padding: 15,
-    backgroundColor: '#111',
+    // backgroundColor: '#111',
     margin: 5,
     elevation: 5,
     borderRadius: 10,
